@@ -4,8 +4,9 @@ let CONFIG = {
 	}]
 };
 
-let PEER_A = document.querySelector("button:first-of-type");
-let PEER_B = document.querySelector("button:last-of-type");
+let PEER_A = document.querySelector("button[data-type=peer-a]");
+let PEER_B = document.querySelector("button[data-type=peer-b]");
+let CLIPBOARD = document.querySelector("button[data-type=clipboard]");
 let TEXT = document.querySelector("textarea");
 let LOG = document.querySelector("pre");
 
@@ -36,6 +37,17 @@ PEER_B.addEventListener("click", async ev => {
 	let answer = await CONN.createAnswer();
 	CONN.setLocalDescription(answer);
 	TEXT.value = JSON.stringify(answer, null, 4);
+});
+
+CLIPBOARD.addEventListener("click", async ev => {
+	let btn = ev.target
+	btn.classList.add("is-pending");
+
+	await navigator.clipboard.writeText(TEXT.value);
+
+	setTimeout(() => {
+		btn.classList.remove("is-pending");
+	}, 1000);
 });
 
 function establishConnection() {

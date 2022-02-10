@@ -41,14 +41,22 @@ pre > * + * {
 pre > code {
 	display: block;
 }
+
+button {
+	transition: transform 1s ease-out;
+}
+button.is-pending {
+	transform: scale(0.8);
+}
 	</style>
 </head>
 
 <body>
 	<h1>WebRTC</h1>
-	<button type="button">register peer A</button>
-	<button type="button">register peer B</button>
+	<button type="button" data-type="peer-a">register peer A</button>
+	<button type="button" data-type="peer-b">register peer B</button>
 	<textarea></textarea>
+	<button type="button" data-type="clipboard">copy to clipboard</button>
 	<pre></pre>
 
 	<script type="module" src="./index.js"></script>
