@@ -7,7 +7,22 @@ let CONFIG = {
 let PEER_A = document.querySelector("button[data-type=peer-a]");
 let PEER_B = document.querySelector("button[data-type=peer-b]");
 let CLIPBOARD = document.querySelector("button[data-type=clipboard]");
-let TEXT = document.querySelector("textarea");
+let TEXT = {
+	_el: document.querySelector("textarea"),
+	set value(obj) {
+		this._el.value = JSON.stringify(obj, null, 4);
+	},
+	get value() {
+		try {
+			return JSON.parse(this._el.value);
+		} catch(err) {
+			return null;
+		}
+	},
+	get raw() {
+		return this._el.value;
+	}
+};
 let LOG = document.querySelector("pre");
 
 let CONN = establishConnection();
@@ -18,32 +33,30 @@ PEER_A.addEventListener("click", async ev => {
 		log("[PEER A] creating offer");
 		let offer = await CONN.createOffer();
 		CONN.setLocalDescription(offer);
-		TEXT.value = JSON.stringify(offer, null, 4);
+		TEXT.value = offer;
 		return;
 	}
 
 	log("[PEER A] processing answer");
-	let answer = JSON.parse(TEXT.value);
-	let desc = new RTCSessionDescription(answer);
-	CONN.setRemoteDescription(desc);
+	let answer = new RTCSessionDescription(TEXT.value);
+	CONN.setRemoteDescription(answer);
 });
 
 PEER_B.addEventListener("click", async ev => {
 	log("[PEER B] processing offer");
-	let offer = JSON.parse(TEXT.value);
-	let desc = new RTCSessionDescription(offer);
-	CONN.setRemoteDescription(desc);
+	let offer = new RTCSessionDescription(TEXT.value);
+	CONN.setRemoteDescription(offer);
 
 	let answer = await CONN.createAnswer();
 	CONN.setLocalDescription(answer);
-	TEXT.value = JSON.stringify(answer, null, 4);
+	TEXT.value = answer;
 });
 
 CLIPBOARD.addEventListener("click", async ev => {
 	let btn = ev.target
 	btn.classList.add("is-pending");
 
-	await navigator.clipboard.writeText(TEXT.value);
+	await navigator.clipboard.writeText(TEXT.raw);
 
 	setTimeout(() => {
 		btn.classList.remove("is-pending");
